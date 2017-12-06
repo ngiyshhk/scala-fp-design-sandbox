@@ -136,6 +136,82 @@ object Chapter3Main extends App {
     def foldRightStrong[A, B](as: List[A], z: B)(f: (A, B) => B): B = {
       foldLeft(reverse(as), z)((b, a) => f(a, b))
     }
+    // ex 3.14
+    def append2[A](a1: List[A], a2: List[A]): List[A] = {
+      foldLeft(a1, a2)((b, a) => Cons(a, b))
+    }
+    // ex 3.15
+//    def concat[A](ass: List[A]*): List[A] = {
+//      foldLeft(List[List[A]].apply(ass), Nil:List[A])((acc, a) => append2(acc, a)) //.applyにしないと何故かコンパイルできない
+//    }
+    // ex 3.16
+    def allPlus1(l: List[Int]): List[Int] = {
+      l match {
+        case Nil => Nil
+        case Cons(head, tail) => Cons(head + 1, allPlus1(tail))
+      }
+    }
+    // ex 3.17
+    def doublesToStrings(l: List[Double]): List[String] = {
+      l match {
+        case Nil => Nil
+        case Cons(head, tail) => Cons(head.toString, doublesToStrings(tail))
+      }
+    }
+    // ex 3.18 ついにmap登場！
+    def map[A, B](as: List[A])(f: A => B): List[B] = {
+      as match {
+        case Nil => Nil
+        case Cons(head, tail) => Cons(f(head), map(tail)(f))
+      }
+    }
+    // ex 3.19
+    def filter[A](as: List[A])(f: A => Boolean): List[A] = {
+      as match {
+        case Nil => Nil
+        case Cons(head, tail) => if (f(head)) Cons(head, filter(tail)(f)) else filter(tail)(f)
+      }
+    }
+    // ex 3.20 みんなだいすきflatMap登場！
+    def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] = {
+      as match {
+        case Nil => Nil
+        case Cons(head, tail) => append2(f(head), flatMap(tail)(f))
+      }
+    }
+    // ex 3.21
+    def filter2[A](as: List[A])(f: A => Boolean): List[A] = {
+      flatMap(as)(a => if (f(a)) Nil else List(a))
+    }
+    // ex 3.22
+    def zip(as: List[Int], bs: List[Int]): List[Int] = {
+      (as, bs) match {
+        case (Nil, _) => Nil
+        case (_, Nil) => Nil
+        case (Cons(ahead, atail), Cons(bhead, btail)) => Cons(ahead + bhead, zip(atail, btail))
+      }
+    }
+    // ex 3.23
+    def zipWith[A, B](a1s: List[A], a2s: List[A])(f: (A, A) => B): List[B] = {
+      (a1s, a2s) match {
+        case (Nil, _) => Nil
+        case (_, Nil) => Nil
+        case (Cons(ahead, atail), Cons(bhead, btail)) => Cons(f(ahead, bhead), zipWith(atail, btail)(f))
+      }
+    }
+    // ex 3.24
+    def hasSubsequence[A](sup: List[A], sub:List[A]): Boolean = {
+      filter2(zipWith(sup, sub)(_ == _))(_ == true) match {
+        case Nil => false
+        case res@Cons(_, _) => {
+          if (length3(res) == length3(sub)) true
+          else sup match {
+            case Nil => false
+            case Cons(head, tail) => hasSubsequence(tail, sub)
+          }
+        }
+      }
+    }
   }
 
   println(List.x)
@@ -150,4 +226,11 @@ object Chapter3Main extends App {
   // ex 3.12
   println(List.reverse(List(1, 2, 3, 4)))
 
+  // ex 3.24
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(1))) // true
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(2))) // true
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(2, 3))) // true
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(2, 4))) // false
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4))) // true
+  println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4, 5))) // false
 }
