@@ -69,13 +69,11 @@ object Chapter2Main extends App {
     // ex 2.1
     def fib(n: Int): Int = {
       @tailrec
-      def go(x: Int, end: Int, next: Int, current: Int): Int = {
-        if (end == 0) 0
-        else if (end == 1) 1
-        else if (end == x) current
-        else go(x + 1, end, next + current, next)
+      def go(x: Int, next: Int, current: Int): Int = {
+        if (x == 0) current
+        else go(x - 1, next + current, next)
       }
-      go(0, n, 1, 0)
+      go(n, 1, 0)
     }
 
     def findFirst(ss: Array[String], key: String): Int = {
