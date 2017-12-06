@@ -134,7 +134,7 @@ case class V3() {
   }
 
   def coalesce(charges: List[Charge]): List[Charge] = { // カードごとのチャージを作る関数がこんなにかんたんに！
-    charges.groupBy(_.cc).values.map(_.reduce(_ combine _)).toList
+    charges.groupBy(_.cc).values.map(_.reduce((acc, o) => acc.combine(o))).toList
   }
 }
 
