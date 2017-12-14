@@ -242,4 +242,65 @@ object Chapter3Main extends App {
   println(List.hasSubsequence(List(1, 2, 3, 4), List(2, 4))) // false
   println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4))) // true
   println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4, 5))) // false
+
+  sealed trait Tree[+A]
+  case class Leaf[A](value: A) extends Tree[A]
+  case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
+
+  object Tree {
+    // ex 3.25
+    def size[A](tree: Tree[A]): Int = {
+      tree match {
+        case Leaf(_) => 1
+        case Branch(left, right) => size(left) + size(right) // stack unsafe
+      }
+    }
+    // ex 3.26
+    def maximize(tree: Tree[Int]): Int = {
+      tree match {
+        case Leaf(value) => value
+        case Branch(left, right) => maximize(left) max maximize(right)
+      }
+    }
+    // ex 3.27
+    def depth[A](tree: Tree[A]): Int = {
+      tree match {
+        case Leaf(_) => 1
+        case Branch(left, right) => depth(left) max depth(right)
+      }
+    }
+    // ex 3.28
+    def map[A, B](tree: Tree[A])(f: A => B): Tree[B] = {
+      tree match {
+        case Leaf(value) => Leaf(f(value))
+        case Branch(left, right) => Branch(map(left)(f), map(right)(f))
+      }
+    }
+    // ex 3.29
+    def fold[A, B](tree: Tree[A], z: B)(f: (B, A) => B): B = {
+      tree match {
+        case Leaf(value) => f(z, value)
+        case Branch(left, right) =>
+          fold(right, fold(left, z)(f))(f)
+      }
+    }
+    def size2[A](tree: Tree[A]): Int =
+      fold(tree, 0)((acc, _) => acc + 1)
+    def maximize2(tree: Tree[Int]): Int =
+      fold(tree, 0)((acc, value) => acc max value)
+    def depth2[A](tree: Tree[A]): Int =
+      fold(tree, 0)((acc, _) => acc max 1)
+  }
+
+  println("************ size ************")
+  println(Tree.size (Branch(Branch(Leaf("a"), Leaf("b")), Branch(Leaf("c"), Leaf("d")))))
+  println(Tree.size2(Branch(Branch(Leaf("a"), Leaf("b")), Branch(Leaf("c"), Leaf("d")))))
+
+  println("************ maximize ************")
+  println(Tree.maximize (Branch(Branch(Leaf(7), Leaf(2)), Branch(Leaf(3), Leaf(4)))))
+  println(Tree.maximize2(Branch(Branch(Leaf(7), Leaf(2)), Branch(Leaf(3), Leaf(4)))))
+
+  println("************ depth ************")
+  println(Tree.depth (Branch(Branch(Leaf(7), Branch(Leaf(2), Leaf(3))), Branch(Leaf(3), Leaf(4)))))
+  println(Tree.depth2(Branch(Branch(Leaf(7), Leaf(2)), Branch(Leaf(3), Leaf(4)))))
 }
