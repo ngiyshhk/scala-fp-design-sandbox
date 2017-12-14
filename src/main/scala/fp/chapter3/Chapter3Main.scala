@@ -181,7 +181,7 @@ object Chapter3Main extends App {
     }
     // ex 3.21
     def filter2[A](as: List[A])(f: A => Boolean): List[A] = {
-      flatMap(as)(a => if (f(a)) Nil else List(a))
+      flatMap(as)(a => if (f(a)) List(a) else Nil)
     }
     // ex 3.22
     def zip(as: List[Int], bs: List[Int]): List[Int] = {
@@ -199,16 +199,17 @@ object Chapter3Main extends App {
         case (Cons(ahead, atail), Cons(bhead, btail)) => Cons(f(ahead, bhead), zipWith(atail, btail)(f))
       }
     }
-    // ex 3.24
+    // ex 3.24 不満
     def hasSubsequence[A](sup: List[A], sub:List[A]): Boolean = {
-      filter2(zipWith(sup, sub)(_ == _))(_ == true) match {
-        case Nil => false
-        case res@Cons(_, _) => {
-          if (length3(res) == length3(sub)) true
-          else sup match {
-            case Nil => false
-            case Cons(head, tail) => hasSubsequence(tail, sub)
-          }
+      if (length3(sup) < length3(sub)) false
+      else {
+        filter2(zipWith(sup, sub)(_ == _))(_ == false) match {
+          case Nil => true
+          case _ =>
+            sup match {
+              case Nil => false
+              case Cons(_, tail) => hasSubsequence(tail, sub)
+            }
         }
       }
     }
@@ -219,14 +220,22 @@ object Chapter3Main extends App {
 //  println(List.dropWhile(List(1, 2, 3, 4, 5), _ < 4)) // <- 型推論できない
   println(List.dropWhileStrong(List(1, 2, 3, 4, 5))(_ < 4)) // <- 型推論できる！(scalaの悲しい仕様)
 
-  // ex 3.8
+  println("************ ex 3. 8 ************")
   // 意図不明。誰か教えて
   println(List.foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_, _)))
 
-  // ex 3.12
+  println("************ ex 3.11 ************")
+  println(List.length3(List(1, 2, 3, 4)))
+
+  println("************ ex 3.12 ************")
   println(List.reverse(List(1, 2, 3, 4)))
 
-  // ex 3.24
+  println("************ ex 3.23 ************")
+  println(List.zipWith(List(1, 2, 3, 4), List(1))((_, _)))
+  println(List.zipWith(List(1, 2, 3, 4), List(1, 2, 3, 4))((_, _)))
+  println(List.zipWith(List(1, 2, 3, 4), List(1, 2, 3, 4, 5))((_, _)))
+
+  println("************ ex 3.24 ************")
   println(List.hasSubsequence(List(1, 2, 3, 4), List(1))) // true
   println(List.hasSubsequence(List(1, 2, 3, 4), List(2))) // true
   println(List.hasSubsequence(List(1, 2, 3, 4), List(2, 3))) // true
