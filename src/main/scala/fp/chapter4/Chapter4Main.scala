@@ -123,5 +123,25 @@ object Chapter4Main extends App {
       }
   }
 
+  println(Either.sequence(List(Right(1), Left("hoge"), Right(2))))
+  println(Either.sequence(List(Right(1), Right(2), Right(3))))
+  println(Either.traverse[String, Int, Int](List(1, 2, 3))(i => Right(i + 1)))
 
+  case class Person(name: Name, age: Age)
+  sealed class Name(val value: String)
+  sealed class Age(val value: Int)
+
+  def mkName(name: String): Either[String, Name] =
+    if (name == "" || name == null) Left("Name is empty.")
+    else Right(new Name(name))
+
+  def mkAge(age: Int): Either[String, Age] =
+    if (age < 0) Left("Age is out of range.")
+    else Right(new Age(age))
+
+  def mkPerson(name: String, age: Int): Either[String, Person] =
+    mkName(name).map2(mkAge(age))(Person)
+
+  // ex 4. 8
+  // アプリカティブ(Validation)
 }
