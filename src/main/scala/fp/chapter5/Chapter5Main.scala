@@ -107,6 +107,11 @@ object Chapter5Main extends App {
       unfold(n)(s => Some((s, s)))
     val ones2: Stream[Int] =
       unfold(1)(_ => Some((1, 1)))
+    val primeNumbers: Stream[Int] =
+      unfold(List[Int]())(s => {
+        val next = from2(2).filter(i => s.forall(i % _ != 0)).headOption2.get
+        Some((next, next :: s))
+      })
   }
 
   println(Stream(1, 2, 3).toList)
@@ -155,4 +160,6 @@ object Chapter5Main extends App {
 
   println(Stream.unfold(0)(s => Some(s + 1, s + 1)).take(10).toList)
   println(Stream.unfold((0, 1))(s => Some(s._1, (s._2, s._1 + s._2))).take(10).toList)
+
+  println(Stream.primeNumbers.take(10).toList)
 }
