@@ -219,6 +219,7 @@ object Chapter3Main extends App {
   println(List.dropWhile(List(1, 2, 3, 4, 5), (i: Int) => i < 4))
 //  println(List.dropWhile(List(1, 2, 3, 4, 5), _ < 4)) // <- 型推論できない
   println(List.dropWhileStrong(List(1, 2, 3, 4, 5))(_ < 4)) // <- 型推論できる！(scalaの悲しい仕様)
+  println(List.init(List(1, 2, 3, 4, 5)))
 
   println("************ ex 3. 8 ************")
   // 意図不明。誰か教えて
@@ -243,7 +244,20 @@ object Chapter3Main extends App {
   println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4))) // true
   println(List.hasSubsequence(List(1, 2, 3, 4), List(1, 2, 3, 4, 5))) // false
 
-  sealed trait Tree[+A]
+  sealed trait Tree[+A] {
+    // ex 3.28
+    def map[B](f: A => B): Tree[B] = {
+      this match {
+        case Leaf(value) => Leaf(f(value))
+        case Branch(left, right) => Branch(left.map(f), right.map(f))
+      }
+    }
+    def mapTree[B](f: A => B): Tree[B] = this match {
+      case Leaf(i) => Leaf(f(i))
+      case Branch(left, right) =>
+        Branch(left.mapTree(f), right.mapTree(f))
+    }
+  }
   case class Leaf[A](value: A) extends Tree[A]
   case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
 

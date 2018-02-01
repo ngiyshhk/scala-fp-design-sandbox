@@ -24,4 +24,7 @@ object VariantMain extends App {
   println(invariant.get(new Kodo))
   println(invariant.get(new Papa))
 //  println(invariant.get(new Jiji)) ng
+
+  println(Seq("1", "2", "3").mkString("a", "b", "c"))
+  println(Seq().mkString("a", "b", "c"))
 }

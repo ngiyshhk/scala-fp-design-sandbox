@@ -161,5 +161,5 @@ object Chapter5Main extends App {
   println(Stream.unfold(0)(s => Some(s + 1, s + 1)).take(10).toList)
   println(Stream.unfold((0, 1))(s => Some(s._1, (s._2, s._1 + s._2))).take(10).toList)
 
-  println(Stream.primeNumbers.take(10).toList)
+  println(Stream.primeNumbers.drop(100).headOption2)
 }
