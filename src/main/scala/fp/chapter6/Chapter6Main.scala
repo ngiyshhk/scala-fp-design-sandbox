@@ -178,6 +178,4 @@ object Chapter6Main extends App {
     println(nonNegativeLessThan(6)(SimpleRNG(5)))
     println(mapViaFlatMap(nonNegativeLessThan(6))(_ + 1)(SimpleRNG(5)))
   }
-
-
 }
