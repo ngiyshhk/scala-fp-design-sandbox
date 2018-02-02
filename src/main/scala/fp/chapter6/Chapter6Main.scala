@@ -135,4 +135,49 @@ object Chapter6Main extends App {
     println(ints2(2)(rng))
     println(ints2(10)(rng))
   }
+
+  // ex 6.8
+  def flatMap[A, B](ra: Rand[A])(f: A => Rand[B]): Rand[B] = { rng =>
+    val (a, rnga) = ra(rng)
+    f(a)(rnga)
+  }
+  def nonNegativeLessThanBroken(n: Int): Rand[Int] =
+    map(nonNegativeInt)(_ % n)
+  def nonNegativeLessThan(n: Int): Rand[Int] = {
+    flatMap(nonNegativeInt){ a =>
+      val mod = a % n
+      if (a + (n - 1) - mod >= 0) unit(mod)
+      else nonNegativeLessThan(mod)
+    }
+  }
+
+  { // TODO 宿題。頭回らない
+    println(nonNegativeLessThanBroken(16159452)(SimpleRNG(42)))
+    println(nonNegativeLessThan(16159452)(SimpleRNG(42)))
+  }
+
+  // ex 6.9
+  def mapViaFlatMap[A, B](ra: Rand[A])(f: A => B): Rand[B] =
+    flatMap(ra)(a => unit(f(a)))
+  def map2ViaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra){a =>
+      flatMap(rb) {b =>
+        unit(f(a, b))
+      }
+    }
+
+  {
+    println(map(nonNegativeInt)(_ % 10)(SimpleRNG(42)))
+    println(mapViaFlatMap(nonNegativeInt)(_ % 10)(SimpleRNG(42)))
+    println(map2(nonNegativeEven, double2)((_, _))(SimpleRNG(42)))
+    println(map2ViaFlatMap(nonNegativeEven, double2)((_, _))(SimpleRNG(42)))
+  }
+
+  {
+    println(nonNegativeLessThanBroken(6)(SimpleRNG(5)))
+    println(nonNegativeLessThan(6)(SimpleRNG(5)))
+    println(mapViaFlatMap(nonNegativeLessThan(6))(_ + 1)(SimpleRNG(5)))
+  }
+
+
 }
