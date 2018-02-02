@@ -1,8 +1,5 @@
 package fp.chapter6
 
-import fp.chapter6.Chapter6Main.{Rand, int, sequence}
-import fp.chapter6.State.Coin
-
 // ex 6.10
 /**
   * ここから大幅ランクアップ
