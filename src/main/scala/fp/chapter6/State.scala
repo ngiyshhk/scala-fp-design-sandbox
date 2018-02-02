@@ -73,7 +73,12 @@ object State extends App {
     } yield xs.map(_ % y)
 
   // ex 6.11
-  sealed trait Input
+  sealed trait Input {
+    def exec(machine: Machine): Machine = this match {
+      case Coin => machine.copy(locked = false, coins = machine.coins + 1)
+      case Turn => machine.copy(locked = true, candies = machine.candies - 1)
+    }
+  }
   case object Coin extends Input
   case object Turn extends Input
   case class Machine(locked: Boolean, candies: Int, coins: Int)
@@ -81,14 +86,10 @@ object State extends App {
     case Nil => unit((0, 0))
     case head :: tail => for {
       m1 <- get[Machine]
-      _  <- set(inputMachine(head, m1))
+      _  <- set(head.exec(m1))
       _  <- simulateMachine(tail)
       m  <- get[Machine]
     } yield (m.coins, m.candies)
-  }
-  def inputMachine(input: Input, machine: Machine) = input match {
-    case Coin => machine.copy(locked = false, coins = machine.coins + 1)
-    case Turn => machine.copy(locked = true, candies = machine.candies - 1)
   }
 
   println(simulateMachine(List(Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn)).run(Machine(true, 5, 10)))
