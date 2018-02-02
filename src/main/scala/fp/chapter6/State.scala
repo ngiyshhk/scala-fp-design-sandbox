@@ -82,10 +82,9 @@ object State extends App {
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = inputs match {
     case Nil => unit((0, 0))
     case head :: tail => for {
-      m1 <- get[Machine]
-      _  <- set(head.exec(m1))
-      _  <- simulateMachine(tail)
-      m  <- get[Machine]
+      _ <- modify(head.exec)
+      _ <- simulateMachine(tail)
+      m <- get[Machine]
     } yield (m.coins, m.candies)
   }
 
