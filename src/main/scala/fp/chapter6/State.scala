@@ -84,7 +84,7 @@ object State extends App {
     case head :: tail => for {
       _ <- modify(head.exec)
       _ <- simulateMachine(tail)
-      m <- get[Machine]
+      m <- get
     } yield (m.coins, m.candies)
   }
 
